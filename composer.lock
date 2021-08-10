@@ -900,6 +900,54 @@
             "time": "2021-01-18T20:58:21+00:00"
         },
         {
+            "name": "level51/silverstripe-jwt-utils",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Level51/silverstripe-jwt-utils.git",
+                "reference": "c8ab4fe1c8b6e5aae6a09ed9d651a728d2c16a06"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Level51/silverstripe-jwt-utils/zipball/c8ab4fe1c8b6e5aae6a09ed9d651a728d2c16a06",
+                "reference": "c8ab4fe1c8b6e5aae6a09ed9d651a728d2c16a06",
+                "shasum": ""
+            },
+            "require": {
+                "firebase/php-jwt": "^5.0.0",
+                "nesbot/carbon": "^1.9.0",
+                "ramsey/uuid": "^3.7.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~3.7",
+                "silverstripe/sqlite3": "^1.4.0"
+            },
+            "default-branch": true,
+            "type": "silverstripe-vendormodule",
+            "autoload": {
+                "psr-4": {
+                    "Level51\\JWTUtils\\": "code/",
+                    "Level51\\JWTUtils\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Julian Scheuchenzuber",
+                    "email": "js@lvl51.de"
+                }
+            ],
+            "description": "Utilities for dealing with JWT in SilverStripe",
+            "support": {
+                "issues": "https://github.com/Level51/silverstripe-jwt-utils/issues",
+                "source": "https://github.com/Level51/silverstripe-jwt-utils/tree/0.2.0"
+            },
+            "time": "2021-05-10T15:24:54+00:00"
+        },
+        {
             "name": "m1/env",
             "version": "2.2.0",
             "source": {
@@ -5590,7 +5638,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "silverstripe/recipe-cms": 0,
-        "silverstripe/login-forms": 0
+        "silverstripe/login-forms": 0,
+        "level51/silverstripe-jwt-utils": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
