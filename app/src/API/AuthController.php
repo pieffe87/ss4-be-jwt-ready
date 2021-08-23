@@ -56,7 +56,7 @@ namespace {
 
           if(is_array($payload) && array_key_exists('token', $payload)) {
             $data = [
-              'status' => 'OK'
+              'code' => 'OK'
             ];
             return $this->jsonResponse($data, 200, $payload['token']);
           }
@@ -90,7 +90,7 @@ namespace {
 
       if ($member) {
         $data = [
-          'status' => 'OK',
+          'code' => 'OK',
           'data' => [
             'email' => $member->Email,
             'firstname' => $member->FirstName,
