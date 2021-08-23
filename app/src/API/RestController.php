@@ -13,23 +13,11 @@ namespace {
     private static $allowed_actions = [
     ];
 
-    public function jsonStandardSuccessData($message)
+    public function jsonStandardMessage($code, $message)
     {
       return [
-        'code' => 'OK',
-        'meta' => [
-          'message' => $message
-        ]
-      ];
-    }
-
-    public function jsonStandardErrorData($message)
-    {
-      return [
-        'code' => 'KO',
-        'meta' => [
-          'message' => $message
-        ]
+        'code' => $code,
+        'msg' => $message
       ];
     }
 
@@ -43,21 +31,47 @@ namespace {
       $this->getResponse()->addHeader('Access-Control-Allow-Origin', '*');
       $this->getResponse()->addHeader('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
       $this->getResponse()->addHeader('Access-Control-Allow-Headers', '*');
+      $this->getResponse()->addHeader('Access-Control-Expose-Headers', '*');
 
       $this->getResponse()->setStatusCode($code);
       return $this->getResponse();
     }
 
-    public function getCurrentMember() {
-      if ($this->getRequest()->getHeader('Authorization') !== null) {
+    public function getCurrentToken()
+    {
+      $header = '';
+      if ($this->getRequest()->getHeader('Authorization') !== null)
+      {
         $header = $this->getRequest()->getHeader('Authorization');
-        list($bearer, $token) = explode(' ',$header);
-        if(JWTUtils::inst()->check($token)) {
-          $decoded = JWT::decode($token, Config::inst()->get(JWTUtils::class, 'secret'), ['HS256']);
-          return Member::get()->byID($decoded->memberId);
+        if (strlen($header) != 0)
+        {
+          list($bearer, $token) = explode(' ', $header);
+          return $token;
         }
       }
+      return $this->jsonResponse($this->jsonStandardMessage('KO', 'No data sent'), 200);
+    }
+
+    public function getCurrentMember()
+    {
+      $token = $this->getCurrentToken();
+      if (!is_string($token)) return $token;
+
+      if (JWTUtils::inst()->check($token))
+      {
+        $decoded = JWT::decode($token, Config::inst()->get(JWTUtils::class, 'secret'), ['HS256']);
+        return Member::get()->byID($decoded->memberId);
+      }
       return false;
+    }
+
+    public function getJsonData()
+    {
+      $json = file_get_contents('php://input');
+      if (strlen($json) == 0) {
+        return $this->jsonResponse($this->jsonStandardMessage('KO', 'No data sent'), 200);
+      }
+      return json_decode($json, true);
     }
 
   }
