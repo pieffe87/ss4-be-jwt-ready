@@ -77,7 +77,7 @@ namespace {
       $data = $this->getJsonData();
       if (!is_array($data)) return $data;
 
-      if(!isset($data['email']) || $data['email'] == '') {
+      if (!isset($data['email']) || $data['email'] == '') {
         $data = [
           'errors' => [
             [
@@ -88,7 +88,7 @@ namespace {
         ];
         return $this->jsonResponse($data, 422);
       }
-      if(!isset($data['password']) || $data['password'] == '') {
+      if (!isset($data['password']) || $data['password'] == '') {
         $data = [
           'errors' => [
             [
@@ -110,7 +110,7 @@ namespace {
         ];
         return $this->jsonResponse($data, 422);
       }
-      if(!isset($data['privacy']) || $data['privacy'] == false) {
+      if (!isset($data['privacy']) || $data['privacy'] == false) {
         $data = [
           'errors' => [
             [
