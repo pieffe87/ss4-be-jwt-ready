@@ -99,55 +99,75 @@ namespace {
         ];
         return $this->jsonResponse($data, 422);
       }
-      if(isset($data['email']) && $data['email'] != '' && isset($data['password']) && $data['password'] != '') {
-        try {
-          $member = Member::get()
-            ->filter('Email', $data['email'])
-            ->first();
+      if (isset($data['password_confirm']) && $data['password_confirm'] != $data['password']) {
+        $data = [
+          'errors' => [
+            [
+              'field' => 'password_confirm',
+              'msg' => 'Le password non coincidono'
+            ]
+          ]
+        ];
+        return $this->jsonResponse($data, 422);
+      }
+      if(!isset($data['privacy']) || $data['privacy'] == false) {
+        $data = [
+          'errors' => [
+            [
+              'field' => 'privacy',
+              'msg' => 'L\'accettazione delle condizioni è obbligatoria'
+            ]
+          ]
+        ];
+        return $this->jsonResponse($data, 422);
+      }
+      try {
+        $member = Member::get()
+          ->filter('Email', $data['email'])
+          ->first();
 
-          if (isset($member->ID)) {
-            $data = [
-              'errors' => [
-                [
-                  'field' => 'email',
-                  'msg' => 'Esiste già un utente con questo indirizzo email'
-                ]
+        if (isset($member->ID)) {
+          $data = [
+            'errors' => [
+              [
+                'field' => 'email',
+                'msg' => 'Esiste già un utente con questo indirizzo email'
               ]
-            ];
-            return $this->jsonResponse($data, 422);
-          }
-
-          $member = Member::create();
-          $member->FirstName = isset($data['first_name']) && strlen($data['first_name']) > 0 ? $data['first_name'] : '';
-          $member->Surname = isset($data['surname']) && strlen($data['surname']) > 0 ? $data['surname'] : '';
-          $member->Email = $data['email'];
-          $member->write();
-          $member->changePassword($data['password']);
-
-          if (Environment::getEnv('MEMBER_REGISTER_DEFAULT_GROUP')) {
-            $groupCode = Environment::getEnv('MEMBER_REGISTER_DEFAULT_GROUP');
-            $group = Group::get()->filter('Code', $groupCode)->first();
-            if (!$group) {
-                $group = new Group();
-                $group->Code = $groupCode;
-                $group->Title = $groupCode;
-                $group->write();
-            }
-            $member->Groups()->add($group);
-          }
-
-          if(isset($member) && isset($member->ID)) {
-            // TODO: Mail di conferma registrazione
-
-            $data = [
-              'code' => 'OK'
-            ];
-            return $this->jsonResponse($data, 200);
-          }
+            ]
+          ];
+          return $this->jsonResponse($data, 422);
         }
-        catch(JWTUtilsException $e) {
-          return $this->jsonResponse($this->jsonStandardMessage('KO', $e->getMessage()), 200);
+
+        $member = Member::create();
+        $member->FirstName = isset($data['first_name']) && strlen($data['first_name']) > 0 ? $data['first_name'] : '';
+        $member->Surname = isset($data['surname']) && strlen($data['surname']) > 0 ? $data['surname'] : '';
+        $member->Email = $data['email'];
+        $member->write();
+        $member->changePassword($data['password']);
+
+        if (Environment::getEnv('MEMBER_REGISTER_DEFAULT_GROUP')) {
+          $groupCode = Environment::getEnv('MEMBER_REGISTER_DEFAULT_GROUP');
+          $group = Group::get()->filter('Code', $groupCode)->first();
+          if (!$group) {
+              $group = new Group();
+              $group->Code = $groupCode;
+              $group->Title = $groupCode;
+              $group->write();
+          }
+          $member->Groups()->add($group);
         }
+
+        if(isset($member) && isset($member->ID)) {
+          // TODO: Mail di conferma registrazione
+
+          $data = [
+            'code' => 'OK'
+          ];
+          return $this->jsonResponse($data, 200);
+        }
+      }
+      catch(JWTUtilsException $e) {
+        return $this->jsonResponse($this->jsonStandardMessage('KO', $e->getMessage()), 200);
       }
     }
 
@@ -179,7 +199,7 @@ namespace {
             'email' => $member->Email,
             'firstname' => $member->FirstName,
             'surname' => $member->Surname,
-            'type' => 'admin'
+            'type' => $member->Groups()->Count() > 0 ? $member->Groups()->First()->Code : 'Managers'
           ]
         ];
         return $this->jsonResponse($data, 200);
