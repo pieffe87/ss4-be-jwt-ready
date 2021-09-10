@@ -110,6 +110,7 @@ namespace {
         ];
         return $this->jsonResponse($data, 422);
       }
+      // TODO: Add silverstripe password validator check
       if (!isset($data['privacy']) || $data['privacy'] == false) {
         $data = [
           'errors' => [
